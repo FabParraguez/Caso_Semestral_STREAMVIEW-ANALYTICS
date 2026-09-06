@@ -20,7 +20,9 @@ import pandas as pd
 
 BASE_DIR = Path(__file__).resolve().parents[1]
 INPUT_CANDIDATES = [
-    BASE_DIR / "StreamViewAnalytics" / "dataset_copy" / "netflix_movies_detailed_up_to_2025_es.csv",
+    BASE_DIR / "StreamViewAnalytics" / "DataSet_Espanol" / "netflix_movies_detailed_up_to_2025_es.csv",
+    BASE_DIR / "StreamViewAnalytics" / "DataSet_Original" / "netflix_movies_detailed_up_to_2025.csv",
+    BASE_DIR / "StreamViewAnalytics" / "DataSet_Copy" / "netflix_movies_detailed_up_to_2025_es.csv",
     BASE_DIR / "StreamViewAnalytics" / "Data_Movies" / "netflix_movies_detailed_up_to_2025.csv",
     BASE_DIR / "Data_Movies" / "netflix_movies_detailed_up_to_2025.csv",
 ]

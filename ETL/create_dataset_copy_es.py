@@ -3,8 +3,8 @@ import unicodedata
 from pathlib import Path
 
 base = Path(r"c:\Users\fabia\OneDrive\Desktop\Caso_Semestral\StreamViewAnalytics")
-input_dir = base / "Data_Movies"
-output_dir = base / "dataset_copy"
+input_dir = base / "DataSet_Original"
+output_dir = base / "DataSet_Espanol"
 output_dir.mkdir(exist_ok=True)
 
 header_map = {
