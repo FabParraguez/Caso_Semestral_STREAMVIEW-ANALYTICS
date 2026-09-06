@@ -1,6 +1,6 @@
 EVALUACIÓN 1 (EP1) – VISUALIZACIÓN DE DATOS
 CASO: STREAMVIEW ANALYTICS
-Caso_Semestral_STREAMVIEW ANALYTICS
+caso-semestral-streamview-analytics
 Ejemplo de flujo de trabajo – Público objetivo: Gerente de Contenidos
 
 Público objetivo: Gerente de Contenidos
