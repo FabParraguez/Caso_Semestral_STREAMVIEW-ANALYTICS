@@ -1,6 +1,3 @@
-# Caso_Semestral_STREAMVIEW-ANALYTICS
-Proyecto semestral de Visual Analytics para StreamView Analytics: transformación del catálogo audiovisual (películas y series) en dashboards interactivos, KPIs y storytelling para apoyar decisiones estratégicas de adquisición, producción y marketing.
-
 # StreamView Analytics — Proyecto Visual Analytics
 
 Solución de Visual Analytics desarrollada como proyecto semestral, donde el equipo asume el rol de consultora externa para **StreamView Analytics**, una plataforma de streaming en Latinoamérica.
