@@ -1,0 +1,24 @@
+LOG DE CALIDAD DE DATOS - PELICULAS (StreamView Analytics)
+=================================================================
+
+Filas cargadas: 16000
+Columnas originales: ['id_muestra', 'tipo', 'titulo', 'director', 'reparto', 'pais', 'fecha_agregada', 'anio_estreno', 'clasificacion', 'duracion', 'generos', 'idioma', 'descripcion', 'popularidad', 'votos', 'promedio_votos', 'presupuesto', 'ingresos']
+Columna 'duracion' eliminada: 100% de valores nulos (no disponible en la fuente).
+Columna 'clasificacion' eliminada: contenido identico a 'promedio_votos' (error de mapeo en la fuente). No representa clasificacion por edad; esa variable NO esta disponible para este dataset.
+Fechas 'fecha_agregada' no parseables: 0
+Duplicados por 'id_muestra': 0
+Duplicados por 'titulo' + 'anio_estreno': 38 (se conservan, se documentan)
+Columna 'director': 132 nulos imputados como 'Sin informacion'.
+Columna 'reparto': 204 nulos imputados como 'Sin informacion'.
+Columna 'pais': 466 nulos imputados como 'Sin informacion'.
+Columna 'generos': 107 nulos imputados como 'Sin informacion'.
+Columna 'descripcion': 132 nulos imputados como 'Sin informacion'.
+Se crearon columnas 'pais_principal' y 'genero_principal' (primer valor de cada lista) para mantener 1 fila = 1 pelicula.
+Registros marcados como NO validos para KPIs financieros (presupuesto o ingresos en 0): 12460 de 16000 (77.9%).
+Columna 'roi' calculada solo para registros validos: (ingresos - presupuesto) / presupuesto.
+Se marcaron como 'outlier_popularidad' los registros sobre el percentil 99 (> 144.48): 160 registros. No se eliminan, solo se etiquetan para tratamiento visual (ej. escala log).
+Columna 'pais' explotada sobre el dataset limpio: 16000 peliculas originales -> 22148 filas finales (una fila por cada pais de produccion). Se conservan todas las columnas limpias, incluidas las financieras. NO sumar presupuesto/ingresos/roi por pais sin deduplicar por 'id_muestra' o usar 'pais_principal' para evitar multiplicar los montos de peliculas coproducidas.
+Archivo generado: C:\Users\fabia\OneDrive\Desktop\Caso_Semestral\dataset_utilizado\peliculas_clean.csv (22148 filas, 24 columnas)
+Archivo generado: C:\Users\fabia\OneDrive\Desktop\Caso_Semestral\dataset_utilizado\peliculas_por_genero.csv (37567 filas). USO: solo para conteos/rankings por genero. NO sumar presupuesto/ingresos aqui.
+
+Filas finales en peliculas_clean.csv: 16000
