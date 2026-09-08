@@ -6959,9 +6959,9 @@ id_muestra,titulo,anio_estreno,generos,pais_principal,idioma,popularidad,promedi
 116835,Pink Floyd: The Story of Wish You Were Here,2012,Musica,Reino Unido,Ingles,5.562,7.323,48
 121286,Buona giornata,2012,Comedia,Italia,Italiano,5.539,4.915,153
 129374,Loom,2012,Ciencia Ficcion,Estados Unidos,Ingles,5.531,5.538,40
-112888,Hatfields and McCoys:  Bad Blood,2012,Drama,Estados Unidos,Ingles,5.501,6.3,36
-112888,Hatfields and McCoys:  Bad Blood,2012,Accion,Estados Unidos,Ingles,5.501,6.3,36
-112888,Hatfields and McCoys:  Bad Blood,2012,Aventura,Estados Unidos,Ingles,5.501,6.3,36
+112888,Hatfields and McCoys: Bad Blood,2012,Drama,Estados Unidos,Ingles,5.501,6.3,36
+112888,Hatfields and McCoys: Bad Blood,2012,Accion,Estados Unidos,Ingles,5.501,6.3,36
+112888,Hatfields and McCoys: Bad Blood,2012,Aventura,Estados Unidos,Ingles,5.501,6.3,36
 114574,Bikini Spring Break,2012,Comedia,Estados Unidos,Ingles,5.496,3.681,47
 125504,A Christmas Story 2,2012,Comedia,Canada,Ingles,5.491,5.085,65
 139255,Abducted: The Carlina White Story,2012,Misterio,Canada,Ingles,5.487,7.7,30
@@ -17763,7 +17763,7 @@ id_muestra,titulo,anio_estreno,generos,pais_principal,idioma,popularidad,promedi
 432985,Gintama,2017,Accion,Japon,Japones,11.959,6.819,124
 432985,Gintama,2017,Comedia,Japon,Japones,11.959,6.819,124
 432985,Gintama,2017,Ciencia Ficcion,Japon,Japones,11.959,6.819,124
-569268,Femdom:  Female Dominance,2017,Sin informacion,Mexico,Espanol,11.929,5.6,8
+569268,Femdom: Female Dominance,2017,Sin informacion,Mexico,Espanol,11.929,5.6,8
 398177,Just Getting Started,2017,Accion,Canada,Ingles,11.922,4.9,239
 398177,Just Getting Started,2017,Comedia,Canada,Ingles,11.922,4.9,239
 660698,Faster Than Light: the Dream of Interstellar Flight,2017,Documental,Sin informacion,Ingles,11.896,6.0,2
@@ -37107,7 +37107,7 @@ id_muestra,titulo,anio_estreno,generos,pais_principal,idioma,popularidad,promedi
 1241934,Mob Cops,2025,Crimen,Estados Unidos,Ingles,6.559,0.0,0
 1241934,Mob Cops,2025,Drama,Estados Unidos,Ingles,6.559,0.0,0
 1437273,Manidham,2025,Drama,India,Tamil,6.549,0.0,0
-1439367,Asthram  – The Secret,2025,Suspenso,India,Tamil,6.535,0.0,0
+1439367,Asthram – The Secret,2025,Suspenso,India,Tamil,6.535,0.0,0
 1405973,Frozempic,2025,Sin informacion,Sin informacion,Ingles,6.535,0.0,0
 804862,Bring Them Down,2025,Drama,Belgica,Ingles,6.52,8.0,3
 804862,Bring Them Down,2025,Suspenso,Belgica,Ingles,6.52,8.0,3

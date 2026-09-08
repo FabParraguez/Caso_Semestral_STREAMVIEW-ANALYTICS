@@ -5,7 +5,7 @@ Filas cargadas: 16000
 Columnas originales: ['id_muestra', 'tipo', 'titulo', 'director', 'reparto', 'pais', 'fecha_agregada', 'anio_estreno', 'clasificacion', 'duracion', 'generos', 'idioma', 'descripcion', 'popularidad', 'votos', 'promedio_votos']
 Duplicados exactos por 'id_muestra' detectados: 9
 Se eliminaron 9 filas duplicadas exactas de 'id_muestra' (mismo titulo/anio/pais). Filas restantes: 15991.
-Columna 'duracion' eliminada: valor constante ('1 Temporadas') en el 100% de los registros. No representa la duracion real de la serie.
+Columna 'duracion' conservada: valor constante ('1 Temporadas') en el 100% de los registros. No representa la duracion real de la serie.
 Columna 'clasificacion' eliminada: contenido identico a 'promedio_votos' (error de mapeo en la fuente). No representa clasificacion por edad; esa variable NO esta disponible para este dataset.
 Fechas 'fecha_agregada' no parseables: 0
 Duplicados por 'titulo' + 'anio_estreno' (no exactos): 36 (se conservan, se documentan)
@@ -20,8 +20,8 @@ Registros marcados como NO validos para KPIs de calificacion (votos = 0): 3666 d
 Se marcaron como 'outlier_popularidad' los registros sobre el percentil 99 (> 467.68): 160 registros. No se eliminan, solo se etiquetan para tratamiento visual (ej. escala log).
 NOTA: El dataset de series no incluye 'presupuesto' ni 'ingresos'. Segun la regla de negocio del caso, estas variables solo aplican a peliculas. No se agregan columnas ficticias; los KPIs financieros deben excluir series.
 Columna 'pais' explotada sobre el dataset limpio: 15991 series originales -> 17741 filas finales (una fila por cada pais de produccion). Se conservan todas las columnas limpias. NO sumar popularidad/votos por pais sin deduplicar por 'id_muestra' o usar 'pais_principal' para evitar multiplicar los valores de series coproducidas.
-Archivo generado: C:\Users\fabia\OneDrive\Desktop\Caso_Semestral\dataset_utilizado\series_clean.csv (17741 filas, 21 columnas)
+Archivo generado: C:\Users\fabia\Downloads\Caso_Semestral_STREAMVIEW-ANALYTICS-TabG\Caso_Semestral_STREAMVIEW-ANALYTICS-TabG\Dataset_Utilizado\series_clean.csv (17741 filas, 22 columnas)
 Se eliminaron 13 combinaciones repetidas de 'id_muestra' + 'generos' originadas por géneros duplicados en la fuente.
-Archivo generado: C:\Users\fabia\OneDrive\Desktop\Caso_Semestral\dataset_utilizado\series_por_genero.csv (29400 filas). USO: solo para conteos/rankings por genero.
+Archivo generado: C:\Users\fabia\Downloads\Caso_Semestral_STREAMVIEW-ANALYTICS-TabG\Caso_Semestral_STREAMVIEW-ANALYTICS-TabG\Dataset_Utilizado\series_por_genero.csv (29400 filas). USO: solo para conteos/rankings por genero.
 
 Filas finales en series_clean.csv: 15991

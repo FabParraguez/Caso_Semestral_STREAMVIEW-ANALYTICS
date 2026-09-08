@@ -27,7 +27,7 @@ INPUT_CANDIDATES = [
     BASE_DIR / "Data_Movies" / "netflix_movies_detailed_up_to_2025.csv",
 ]
 INPUT_PATH = next((p for p in INPUT_CANDIDATES if p.exists()), INPUT_CANDIDATES[0])
-OUTPUT_DIR = BASE_DIR / "dataset_utilizado"
+OUTPUT_DIR = BASE_DIR / "Dataset_Utilizado"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 log = []
@@ -49,10 +49,10 @@ log_print(f"Columnas originales: {list(df.columns)}")
 # =========================================================
 # 2. ELIMINAR COLUMNAS NO UTILIZABLES
 # =========================================================
-# 'duracion' esta 100% vacia -> se elimina y se documenta como limitacion.
+# Se conserva la columna original para trazabilidad, aunque no es utilizable:
+# la fuente no contiene ningun valor de duracion para peliculas.
 if df["duracion"].isnull().mean() == 1.0:
-    df = df.drop(columns=["duracion"])
-    log_print("Columna 'duracion' eliminada: 100% de valores nulos (no disponible en la fuente).")
+    log_print("Columna 'duracion' conservada: 100% de valores nulos (no disponible en la fuente).")
 
 # 'clasificacion' es identica a 'promedio_votos' (no es clasificacion por edad real).
 # Se elimina para evitar interpretarla erroneamente como rating de edad.
@@ -72,6 +72,19 @@ if (df["clasificacion"] == df["promedio_votos"]).mean() == 1.0:
 cols_texto = ["titulo", "director", "reparto", "pais", "generos", "idioma"]
 for col in cols_texto:
     df[col] = df[col].astype("string").str.strip()
+
+# Limpieza defensiva de caracteres de control/saltos de línea que pueden
+# romper el parseo CSV en lectores estrictos (pandas engine='c').
+for col in ["titulo", "director", "reparto", "pais", "generos", "idioma", "descripcion"]:
+    df[col] = (
+        df[col]
+        .astype("string")
+        .str.replace(r"[\r\n\t]+", " ", regex=True)
+        .str.replace("\u2028", " ", regex=False)
+        .str.replace("\u2029", " ", regex=False)
+        .str.replace(r"\s{2,}", " ", regex=True)
+        .str.strip()
+    )
 
 # =========================================================
 # 4. FECHAS Y TIPOS

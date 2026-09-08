@@ -103,12 +103,55 @@ Promover contenidos de 90–120 minutos
 
 Resultado: Decisiones informadas que generan impacto en el negocio.
 
-Paso de la imagen
-1. Entender el negocio	✅ Sí — EP1
-2. Preparar los datos	✅ Sí — EP1
-3. Explorar y analizar	✅ Sí — EP1 (exploración visual)
-Storytelling inicial	✅ Sí — EP1
-4. Diseñar la visualización	⚠️ Empieza a ser EP2
-5. Construir el dashboard	❌ No — eso es EP2 (Diseño de Dashboards)
-6. Interpretar y comunicar (a fondo)	❌ No — eso se refuerza en EP3 (evaluación crítica)
-7. Recomendar y tomar decisiones (final)	❌ No — eso se consolida en la EFT (Presentación Ejecutiva)
+Aún le faltan:
+
+- mejor narrativa ejecutiva,
+- más recomendaciones de negocio,
+- una redacción más clara en el storytelling,
+- un ajuste final de diseño para que se vea más “decisión” y menos “análisis técnico”.
+
+## ⚠️ Lo que aún necesita mejora
+
+### 1) La parte narrativa no está fuerte todavía
+
+El dashboard cumple la parte visual, pero aún le falta una historia ejecutiva clara:
+
+- ¿qué está pasando?
+- ¿por qué importa?
+- ¿qué recomendación se extrae?
+- ¿qué decisión de negocio se toma?
+
+Eso se pide explícitamente en `Descripcion_Caso_Completo.md` y en `EvaluacionParcial1.md`.
+
+### 2) Hay riesgo de interpretación errónea en agregados
+
+Los ETL ya dejan advertencias importantes sobre:
+
+- duplicación por país,
+- columnas no confiables,
+- conteos por país que pueden inflarse si no se deduplica por id.
+
+Eso es correcto y demuestra rigor, pero en la visualización hay que tener mucho cuidado con:
+
+- sumar por país sin usar la dimensión correcta,
+- comparar métricas financieras sin filtrar por película válida.
+
+### 3) El gráfico “plano” no es un error real
+
+La caída final no es un fallo de la base. La evidencia indica que:
+
+- los datos están casi estables año a año,
+- 2025 aparece menor porque probablemente es un año incompleto o con cobertura parcial.
+
+Eso no invalida el proyecto; solo hay que interpretarlo bien.
+
+### 4) Falta un mensaje de negocio más claro
+
+El dashboard se ve bien, pero aún parece más técnico que ejecutivo.
+Falta una capa final de storytelling para resumir:
+
+- géneros más relevantes,
+- países estratégicos,
+- oportunidades de adquisición,
+- recomendaciones concretas.
+
