@@ -28,7 +28,7 @@ INPUT_CANDIDATES = [
     BASE_DIR / "Data_Movies" / "netflix_tv_shows_detailed_up_to_2025.csv",
 ]
 INPUT_PATH = next((path for path in INPUT_CANDIDATES if path.exists()), INPUT_CANDIDATES[0])
-OUTPUT_DIR = BASE_DIR / "dataset_utilizado"
+OUTPUT_DIR = BASE_DIR / "Dataset_Utilizado"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 log = []
@@ -91,6 +91,19 @@ if (df["clasificacion"] == df["promedio_votos"]).mean() == 1.0:
 cols_texto = ["titulo", "director", "reparto", "pais", "generos", "idioma"]
 for col in cols_texto:
     df[col] = df[col].astype("string").str.strip()
+
+# Limpieza defensiva de caracteres de control/saltos de línea que pueden
+# romper el parseo CSV en lectores estrictos (pandas engine='c').
+for col in ["titulo", "director", "reparto", "pais", "generos", "idioma", "descripcion"]:
+    df[col] = (
+        df[col]
+        .astype("string")
+        .str.replace(r"[\r\n\t]+", " ", regex=True)
+        .str.replace("\u2028", " ", regex=False)
+        .str.replace("\u2029", " ", regex=False)
+        .str.replace(r"\s{2,}", " ", regex=True)
+        .str.strip()
+    )
 
 # =========================================================
 # 5. FECHAS

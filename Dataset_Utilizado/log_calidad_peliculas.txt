@@ -18,7 +18,7 @@ Registros marcados como NO validos para KPIs financieros (presupuesto o ingresos
 Columna 'roi' calculada solo para registros validos: (ingresos - presupuesto) / presupuesto.
 Se marcaron como 'outlier_popularidad' los registros sobre el percentil 99 (> 144.48): 160 registros. No se eliminan, solo se etiquetan para tratamiento visual (ej. escala log).
 Columna 'pais' explotada sobre el dataset limpio: 16000 peliculas originales -> 22148 filas finales (una fila por cada pais de produccion). Se conservan todas las columnas limpias, incluidas las financieras. NO sumar presupuesto/ingresos/roi por pais sin deduplicar por 'id_muestra' o usar 'pais_principal' para evitar multiplicar los montos de peliculas coproducidas.
-Archivo generado: C:\Users\fabia\OneDrive\Desktop\Caso_Semestral\dataset_utilizado\peliculas_clean.csv (22148 filas, 24 columnas)
-Archivo generado: C:\Users\fabia\OneDrive\Desktop\Caso_Semestral\dataset_utilizado\peliculas_por_genero.csv (37567 filas). USO: solo para conteos/rankings por genero. NO sumar presupuesto/ingresos aqui.
+Archivo generado: /Users/tabathagamboa/Desktop/informatica_repositorios/visualizacion de datos/proyecto/Caso_Semestral_STREAMVIEW-ANALYTICS/Dataset_Utilizado/peliculas_clean.csv (22148 filas, 24 columnas)
+Archivo generado: /Users/tabathagamboa/Desktop/informatica_repositorios/visualizacion de datos/proyecto/Caso_Semestral_STREAMVIEW-ANALYTICS/Dataset_Utilizado/peliculas_por_genero.csv (37567 filas). USO: solo para conteos/rankings por genero. NO sumar presupuesto/ingresos aqui.
 
 Filas finales en peliculas_clean.csv: 16000
