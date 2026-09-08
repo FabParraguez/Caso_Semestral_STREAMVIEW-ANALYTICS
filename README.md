@@ -19,7 +19,6 @@ Transformar el catálogo audiovisual (películas y series) en información accio
 
 ## 🛠️ Stack
 - Limpieza y ETL: Python (pandas)
-- Visualización: Power BI / Tableau / Excel (según definición del equipo)
 
 ## 👥 Integrantes
 - Tabatha Gamboa — Ingeniería en Informática, mención Ciencia de Datos
