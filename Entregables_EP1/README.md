@@ -16,7 +16,7 @@ pip install -r requirements_dashboard.txt
 ## 3) Ejecutar el dashboard
 
 ```bash
-
+streamlit run .\Entregables_EP1\dashboard_gerencia_contenidos.py
 ```
 
 > También puedes usar el Python del entorno virtual:
