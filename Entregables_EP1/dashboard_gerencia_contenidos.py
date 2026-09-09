@@ -528,24 +528,33 @@ colC, colD = st.columns(2)
 
 with colC:
     top_countries = (
-        catalogo_unique.drop_duplicates(subset=["tipo", "id_muestra", "pais_principal"])
-        .groupby("pais_principal", as_index=False)
-        .size()
-        .rename(columns={"size": "titulos", "pais_principal": "pais"})
-        .sort_values("titulos", ascending=False)
+        catalogo_unique.groupby("pais_principal", as_index=False)
+        .agg(
+            popularidad_promedio=("popularidad", "mean"),
+            rating_promedio=("promedio_votos", "mean"),
+            titulos=("id_muestra", "nunique"),
+        )
+        .query("titulos >= 20")
+        .sort_values("popularidad_promedio", ascending=False)
         .head(10)
     )
     fig_countries = px.bar(
-        top_countries.sort_values("titulos", ascending=True),
-        x="titulos",
-        y="pais",
+        top_countries.sort_values("popularidad_promedio", ascending=True),
+        x="popularidad_promedio",
+        y="pais_principal",
         orientation="h",
-        title="Top países por cantidad de títulos",
-        color="titulos",
+        title="Popularidad promedio por país productor",
+        color="popularidad_promedio",
         color_continuous_scale="Teal",
-        text="titulos",
+        hover_data=["rating_promedio", "titulos"],
+        text="popularidad_promedio",
     )
-    fig_countries.update_traces(texttemplate="%{text:,.0f}", textposition="outside")
+    fig_countries.update_traces(texttemplate="%{text:.2f}", textposition="outside")
+    fig_countries.update_layout(
+        xaxis_title="Popularidad promedio",
+        yaxis_title="País productor",
+        coloraxis_colorbar_title="Popularidad",
+    )
     st.plotly_chart(fig_countries, config={"displayModeBar": False}, use_container_width=True)
 
 with colD:
