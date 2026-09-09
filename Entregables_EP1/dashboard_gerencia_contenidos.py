@@ -2,6 +2,7 @@ from pathlib import Path
 
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
 import streamlit as st
 
 
@@ -390,6 +391,7 @@ genero_ejecutivo = (
     catalogo_unique.groupby("genero_principal", as_index=False)
     .agg(
         popularidad_promedio=("popularidad", "mean"),
+        rating_promedio=("promedio_votos", "mean"),
         titulos=("id_muestra", "nunique"),
     )
 )
@@ -398,8 +400,13 @@ genero_ejecutivo_elegible = genero_ejecutivo[
 ]
 if genero_ejecutivo_elegible.empty:
     genero_ejecutivo_elegible = genero_ejecutivo
+genero_ejecutivo_elegible = genero_ejecutivo_elegible.copy()
+genero_ejecutivo_elegible["indice_equilibrado"] = (
+    genero_ejecutivo_elegible["popularidad_promedio"].rank(pct=True) * 0.5
+    + genero_ejecutivo_elegible["rating_promedio"].rank(pct=True) * 0.5
+)
 genero_destacado = genero_ejecutivo_elegible.sort_values(
-    ["popularidad_promedio", "titulos"], ascending=False
+    ["indice_equilibrado", "titulos"], ascending=False
 ).iloc[0]
 
 roi_mediano_ejecutivo = pd.to_numeric(
@@ -411,9 +418,9 @@ st.subheader("Resumen ejecutivo")
 ejecutivo1, ejecutivo2, ejecutivo3 = st.columns(3)
 ejecutivo1.metric("Catálogo analizado", f"{catalogo_unique['id_muestra'].nunique():,} títulos")
 ejecutivo2.metric(
-    "Género con mayor popularidad promedio",
+    "Género recomendado para adquisición",
     str(genero_destacado["genero_principal"]),
-    f"Popularidad {genero_destacado['popularidad_promedio']:.2f}",
+    f"Pop. {genero_destacado['popularidad_promedio']:.2f} | Rating {genero_destacado['rating_promedio']:.2f}",
 )
 ejecutivo3.metric(
     "ROI mediano de películas",
@@ -524,40 +531,62 @@ with colB:
     fig_genres.update_traces(texttemplate="%{text:,.0f}", textposition="outside")
     st.plotly_chart(fig_genres, config={"displayModeBar": False}, use_container_width=True)
 
-colC, colD = st.columns(2)
+country_summary = (
+    catalogo_unique.groupby("pais_principal", as_index=False)
+    .agg(
+        popularidad_promedio=("popularidad", "mean"),
+        rating_promedio=("promedio_votos", "mean"),
+        titulos=("id_muestra", "nunique"),
+    )
+    .query("titulos >= 20")
+)
+top_countries_volume = country_summary.nlargest(10, "titulos")
+top_countries_popularity = country_summary.nlargest(10, "popularidad_promedio")
+country_names = set(top_countries_volume["pais_principal"]) | set(
+    top_countries_popularity["pais_principal"]
+)
+country_comparison = country_summary[
+    country_summary["pais_principal"].isin(country_names)
+].sort_values("titulos")
 
-with colC:
-    top_countries = (
-        catalogo_unique.groupby("pais_principal", as_index=False)
-        .agg(
-            popularidad_promedio=("popularidad", "mean"),
-            rating_promedio=("promedio_votos", "mean"),
-            titulos=("id_muestra", "nunique"),
-        )
-        .query("titulos >= 20")
-        .sort_values("popularidad_promedio", ascending=False)
-        .head(10)
-    )
-    fig_countries = px.bar(
-        top_countries.sort_values("popularidad_promedio", ascending=True),
-        x="popularidad_promedio",
-        y="pais_principal",
-        orientation="h",
-        title="Popularidad promedio por país productor",
-        color="popularidad_promedio",
-        color_continuous_scale="Teal",
-        hover_data=["rating_promedio", "titulos"],
-        text="popularidad_promedio",
-    )
-    fig_countries.update_traces(texttemplate="%{text:.2f}", textposition="outside")
-    fig_countries.update_layout(
-        xaxis_title="Popularidad promedio",
-        yaxis_title="País productor",
-        coloraxis_colorbar_title="Popularidad",
-    )
-    st.plotly_chart(fig_countries, config={"displayModeBar": False}, use_container_width=True)
+fig_country_comparison = go.Figure()
+fig_country_comparison.add_bar(
+    x=country_comparison["pais_principal"],
+    y=country_comparison["titulos"],
+    name="Cantidad de títulos",
+    marker_color="#4f7898",
+    text=country_comparison["titulos"],
+    texttemplate="%{text:,.0f}",
+    textposition="outside",
+    hovertemplate="%{x}<br>Títulos: %{y:,.0f}<extra></extra>",
+)
+fig_country_comparison.add_scatter(
+    x=country_comparison["pais_principal"],
+    y=country_comparison["popularidad_promedio"],
+    name="Popularidad promedio",
+    mode="lines+markers+text",
+    text=country_comparison["popularidad_promedio"],
+    texttemplate="%{text:.2f}",
+    textposition="top center",
+    line={"color": "#55c2b4", "width": 3},
+    marker={"size": 8},
+    yaxis="y2",
+    hovertemplate="%{x}<br>Popularidad: %{y:.2f}<extra></extra>",
+)
+fig_country_comparison.update_layout(
+    title="Países productores: cantidad de títulos vs popularidad",
+    xaxis_title="País productor",
+    yaxis={"title": "Cantidad de títulos"},
+    yaxis2={"title": "Popularidad promedio", "overlaying": "y", "side": "right"},
+    hovermode="x unified",
+    legend={"orientation": "h", "y": 1.12},
+)
+st.plotly_chart(fig_country_comparison, config={"displayModeBar": False}, use_container_width=True)
 
-with colD:
+st.subheader("Impacto por género")
+colE, colF = st.columns(2)
+
+with colE:
     impacto_genero = (
         catalogo_unique.groupby("genero_principal", as_index=False)
         .agg(
@@ -565,28 +594,72 @@ with colD:
             rating_promedio=("promedio_votos", "mean"),
             titulos=("id_muestra", "nunique"),
         )
-        .sort_values("popularidad_promedio", ascending=False)
+        .query("titulos >= 20")
+    )
+    impacto_genero["popularidad_relativa"] = impacto_genero[
+        "popularidad_promedio"
+    ].rank(pct=True)
+    impacto_genero["rating_relativo"] = impacto_genero["rating_promedio"].rank(
+        pct=True
+    )
+    impacto_genero["indice_equilibrado"] = (
+        impacto_genero["popularidad_relativa"] * 0.5
+        + impacto_genero["rating_relativo"] * 0.5
+    )
+    impacto_genero = (
+        impacto_genero.sort_values("indice_equilibrado", ascending=False)
         .head(10)
     )
 
     fig_impacto_genero = px.bar(
-        impacto_genero.sort_values("popularidad_promedio", ascending=True),
-        x="popularidad_promedio",
+        impacto_genero.sort_values("indice_equilibrado", ascending=True),
+        x="indice_equilibrado",
         y="genero_principal",
         orientation="h",
-        title="Popularidad promedio por género",
-        color="popularidad_promedio",
+        title="Top 10 géneros por índice equilibrado",
+        color="indice_equilibrado",
         color_continuous_scale="Blues",
-        hover_data=["rating_promedio", "titulos"],
-        text="popularidad_promedio",
+        hover_data=["popularidad_promedio", "rating_promedio", "titulos"],
+        text="indice_equilibrado",
     )
-    fig_impacto_genero.update_traces(texttemplate="%{text:.2f}", textposition="outside")
+    fig_impacto_genero.update_traces(texttemplate="%{text:.3f}", textposition="outside")
     fig_impacto_genero.update_layout(
-        xaxis_title="Popularidad promedio",
+        xaxis_title="Índice equilibrado",
         yaxis_title="Género",
-        showlegend=False,
+        coloraxis_colorbar_title="Índice",
     )
     st.plotly_chart(fig_impacto_genero, config={"displayModeBar": False}, use_container_width=True)
+
+with colF:
+    rating_genero = (
+        catalogo_unique.groupby("genero_principal", as_index=False)
+        .agg(
+            rating_promedio=("promedio_votos", "mean"),
+            popularidad_promedio=("popularidad", "mean"),
+            titulos=("id_muestra", "nunique"),
+        )
+        .query("titulos >= 20")
+        .sort_values("rating_promedio", ascending=False)
+        .head(10)
+    )
+    fig_rating_genero = px.bar(
+        rating_genero.sort_values("rating_promedio", ascending=True),
+        x="rating_promedio",
+        y="genero_principal",
+        orientation="h",
+        title="Rating promedio por género",
+        color="rating_promedio",
+        color_continuous_scale="Blues",
+        hover_data=["popularidad_promedio", "titulos"],
+        text="rating_promedio",
+    )
+    fig_rating_genero.update_traces(texttemplate="%{text:.2f}", textposition="outside")
+    fig_rating_genero.update_layout(
+        xaxis_title="Rating promedio",
+        yaxis_title="Género",
+        coloraxis_colorbar_title="Rating",
+    )
+    st.plotly_chart(fig_rating_genero, config={"displayModeBar": False}, use_container_width=True)
 
 st.subheader("Duración y atractivo de audiencia")
 duracion_catalogo = catalogo_unique.copy()
@@ -650,9 +723,20 @@ if generos_recomendables.empty:
             titulos=("id_muestra", "size"),
         )
     )
+
+generos_recomendables["popularidad_relativa"] = generos_recomendables[
+    "popularidad_promedio"
+].rank(pct=True)
+generos_recomendables["rating_relativo"] = generos_recomendables[
+    "rating_promedio"
+].rank(pct=True)
+generos_recomendables["indice_equilibrado"] = (
+    generos_recomendables["popularidad_relativa"] * 0.5
+    + generos_recomendables["rating_relativo"] * 0.5
+)
 genero_recomendado = (
     generos_recomendables
-    .sort_values(["popularidad_promedio", "titulos"], ascending=False)
+    .sort_values(["indice_equilibrado", "titulos"], ascending=False)
     .iloc[0]
 )
 
@@ -661,6 +745,7 @@ paises_recomendables = (
     .groupby("pais_principal", as_index=False)
     .agg(
         popularidad_promedio=("popularidad", "mean"),
+        rating_promedio=("promedio_votos", "mean"),
         titulos=("id_muestra", "size"),
     )
 )
@@ -673,21 +758,60 @@ if paises_recomendables.empty:
         .groupby("pais_principal", as_index=False)
         .agg(
             popularidad_promedio=("popularidad", "mean"),
+            rating_promedio=("promedio_votos", "mean"),
             titulos=("id_muestra", "size"),
         )
     )
+paises_recomendables["popularidad_relativa"] = paises_recomendables[
+    "popularidad_promedio"
+].rank(pct=True)
+paises_recomendables["rating_relativo"] = paises_recomendables[
+    "rating_promedio"
+].rank(pct=True)
+paises_recomendables["indice_equilibrado"] = (
+    paises_recomendables["popularidad_relativa"] * 0.5
+    + paises_recomendables["rating_relativo"] * 0.5
+)
 pais_recomendado = (
     paises_recomendables
-    .sort_values(["popularidad_promedio", "titulos"], ascending=False)
+    .sort_values(["indice_equilibrado", "titulos"], ascending=False)
     .iloc[0]
 )
 
+titulos_impacto = catalogo_unique.copy()
+titulos_impacto["votos_numerico"] = pd.to_numeric(
+    titulos_impacto["votos"], errors="coerce"
+)
+titulos_impacto["popularidad_relativa"] = titulos_impacto["popularidad"].rank(pct=True)
+titulos_impacto["rating_relativo"] = titulos_impacto["promedio_votos"].rank(pct=True)
+titulos_impacto["indice_equilibrado"] = (
+    titulos_impacto["popularidad_relativa"] * 0.5
+    + titulos_impacto["rating_relativo"] * 0.5
+)
+titulos_impacto = titulos_impacto[
+    titulos_impacto["votos_numerico"] >= 20
+].copy()
+
 titulos_recomendados = (
-    catalogo_unique.sort_values(["popularidad", "promedio_votos"], ascending=False)
+    titulos_impacto[
+        titulos_impacto["genero_principal"] == genero_recomendado["genero_principal"]
+    ]
+    .sort_values("indice_equilibrado", ascending=False)
     .head(3)["titulo"]
     .astype(str)
     .tolist()
 )
+traducciones_titulos = {
+    "Chronicles of the Sun": "Crónicas del Sol",
+    "Volta por Cima": "Vuelta por lo alto",
+    "She's the One": "Ella es la indicada",
+}
+titulos_recomendados = [
+    f"{titulo} ({traducciones_titulos[titulo]})"
+    if titulo in traducciones_titulos
+    else titulo
+    for titulo in titulos_recomendados
+]
 titulos_texto = ", ".join(titulos_recomendados)
 
 st.subheader("Recomendaciones de negocio")
@@ -698,7 +822,7 @@ with rec1:
         f"""
         <div class='recommendation-card'>
         <b>1. Priorizar adquisiciones</b><br>
-        Evaluar nuevas adquisiciones en <b>{genero_recomendado['genero_principal']}</b>, que presenta la mayor popularidad promedio entre los géneros con evidencia suficiente ({genero_recomendado['popularidad_promedio']:.2f}; {int(genero_recomendado['titulos']):,} títulos).
+        Evaluar nuevas adquisiciones en <b>{genero_recomendado['genero_principal']}</b>, que equilibra popularidad ({genero_recomendado['popularidad_promedio']:.2f}) y rating ({genero_recomendado['rating_promedio']:.2f}) entre los géneros con evidencia suficiente ({int(genero_recomendado['titulos']):,} títulos).
         </div>
         """,
         unsafe_allow_html=True,
@@ -709,7 +833,7 @@ with rec2:
         f"""
         <div class='recommendation-card'>
         <b>2. Producir con foco</b><br>
-        Considerar <b>{pais_recomendado['pais_principal']}</b> como mercado atractivo por popularidad promedio ({pais_recomendado['popularidad_promedio']:.2f}) y evidencia suficiente ({int(pais_recomendado['titulos']):,} títulos); no es una recomendación por volumen.
+        Considerar producciones de <b>{pais_recomendado['pais_principal']}</b> por su equilibrio entre popularidad ({pais_recomendado['popularidad_promedio']:.2f}) y rating ({pais_recomendado['rating_promedio']:.2f}), con evidencia suficiente ({int(pais_recomendado['titulos']):,} títulos).
         </div>
         """,
         unsafe_allow_html=True,
@@ -720,15 +844,18 @@ with rec3:
         f"""
         <div class='recommendation-card'>
         <b>3. Promocionar con criterio</b><br>
-        Priorizar campañas para <b>{titulos_texto}</b>, los títulos con mayor popularidad dentro de la selección actual.
+        Priorizar campañas para <b>{titulos_texto}</b>, los títulos con mayor popularidad dentro del género <b>{genero_recomendado['genero_principal']}</b>.
         </div>
         """,
         unsafe_allow_html=True,
     )
 
-st.subheader("Top títulos por impacto | mayor a menor")
-impact_table = catalogo_unique.sort_values(["popularidad", "promedio_votos"], ascending=False).head(12)[
-    ["titulo", "tipo", "pais_principal", "genero_principal", "popularidad", "promedio_votos", "votos"]
+st.subheader("Top títulos por impacto equilibrado | mayor a menor")
+impact_table = titulos_impacto.sort_values("indice_equilibrado", ascending=False).head(12)[
+    [
+        "titulo", "tipo", "pais_principal", "genero_principal", "popularidad",
+        "promedio_votos", "votos", "indice_equilibrado",
+    ]
 ].reset_index(drop=True)
 impact_table.insert(0, "Posición", range(1, len(impact_table) + 1))
 
