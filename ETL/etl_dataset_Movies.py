@@ -6,10 +6,10 @@ Aplica limpieza y transformaciones documentadas para dejar el dataset
 de PELICULAS listo para análisis y visualización.
 
 Salidas:
- 1. peliculas_clean.csv        -> UNA FILA POR PAIS (dataset limpio ya explotado por 'pais').
-                                   Si una pelicula tiene 3 paises, aparece 3 veces (una por pais),
-                                   conservando TODAS las columnas limpias (incluidas financieras).
-                                   Incluye 'cantidad_paises' para saber cuando NO sumar dinero.
+ 1. peliculas_clean.csv        -> UNA FILA POR PELICULA, conservando 'pais' como
+                                   aparece en el dataset de origen. Si una pelicula
+                                   tiene varios paises, se mantienen en la misma celda.
+                                   Incluye 'cantidad_paises' para identificar coproducciones.
  2. peliculas_por_genero.csv   -> explode de genero (para rankings/gráficos por género)
  3. log_calidad_peliculas.txt  -> resumen de decisiones tomadas (trazabilidad)
 """
@@ -161,36 +161,20 @@ log_print(
 )
 
 # =========================================================
-# 10. EXPLODE DE 'pais' DIRECTAMENTE SOBRE EL DATASET LIMPIO (salida unica)
+# 10. DATASET PRINCIPAL: UNA FILA POR PELICULA
 # =========================================================
-# En lugar de mantener dos archivos separados (uno con 1 fila = 1 pelicula y
-# otro solo con pais explotado), se deja UN UNICO archivo "peliculas_clean.csv"
-# donde 'pais' ya viene explotado: si una pelicula tiene 3 paises, va a
-# aparecer en 3 filas (una por cada pais), pero conservando TODAS las columnas
-# limpias generadas (incluidas presupuesto, ingresos, roi, etc.).
-#
-# Esto es correcto para responder preguntas como "¿que paises producen mas
-# contenido?" (cada pais debe contar +1 por cada pelicula en la que participo).
-#
-# IMPORTANTE (queda documentado y en columna 'cantidad_paises'):
-# NO se debe sumar 'presupuesto', 'ingresos' ni 'roi' agrupando por pais sin
-# considerar que una misma pelicula puede repetirse varias veces. Para KPIs
-# financieros agregados, filtrar primero por 'pais_principal' o deduplicar
-# por 'id_muestra'.
-df_exploded = df.assign(pais=df["pais"].str.split(",")).explode("pais")
-df_exploded["pais"] = df_exploded["pais"].str.strip()
+# Se conserva 'pais' como una lista de paises de produccion en la misma fila.
+# Asi, las coproducciones no duplican peliculas ni sus metricas financieras.
+# 'pais_principal' queda disponible para analisis por un solo pais.
+df_clean = df.copy()
 log_print(
-    f"Columna 'pais' explotada sobre el dataset limpio: {len(df)} peliculas "
-    f"originales -> {len(df_exploded)} filas finales (una fila por cada pais "
-    "de produccion). Se conservan todas las columnas limpias, incluidas las "
-    "financieras. NO sumar presupuesto/ingresos/roi por pais sin deduplicar "
-    "por 'id_muestra' o usar 'pais_principal' para evitar multiplicar los "
-    "montos de peliculas coproducidas."
+    f"Columna 'pais' conservada sin explotar: {len(df_clean)} filas finales "
+    "(una fila por pelicula). Los paises de coproduccion permanecen en la misma celda."
 )
 
 out_main = OUTPUT_DIR / "peliculas_clean.csv"
-df_exploded.to_csv(out_main, index=False)
-log_print(f"Archivo generado: {out_main} ({len(df_exploded)} filas, {len(df_exploded.columns)} columnas)")
+df_clean.to_csv(out_main, index=False)
+log_print(f"Archivo generado: {out_main} ({len(df_clean)} filas, {len(df_clean.columns)} columnas)")
 
 # =========================================================
 # 11. TABLA EXPLOTADA POR GENERO (para rankings de conteo por genero)

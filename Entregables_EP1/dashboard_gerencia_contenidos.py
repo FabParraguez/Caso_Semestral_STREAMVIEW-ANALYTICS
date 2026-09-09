@@ -174,6 +174,19 @@ def load_data():
     peliculas["tipo"] = "Pelicula"
     series["tipo"] = "Serie"
 
+    if "roi" not in peliculas.columns:
+        presupuesto = pd.to_numeric(peliculas["presupuesto"], errors="coerce")
+        ingresos = pd.to_numeric(peliculas["ingresos"], errors="coerce")
+        peliculas["roi"] = pd.NA
+        valido_para_roi = (presupuesto > 0) & (ingresos > 0)
+        peliculas.loc[valido_para_roi, "roi"] = (
+            ingresos[valido_para_roi] - presupuesto[valido_para_roi]
+        ) / presupuesto[valido_para_roi]
+
+    series["roi"] = pd.NA
+    series["presupuesto"] = pd.NA
+    series["ingresos"] = pd.NA
+
     common_cols = [
         "id_muestra",
         "tipo",
@@ -186,6 +199,9 @@ def load_data():
         "popularidad",
         "votos",
         "promedio_votos",
+        "roi",
+        "presupuesto",
+        "ingresos",
     ]
 
     catalogo = pd.concat(
@@ -370,6 +386,44 @@ if catalogo_f.empty:
 
 catalogo_unique = catalogo_f.drop_duplicates(subset=["tipo", "id_muestra"]).copy()
 
+genero_ejecutivo = (
+    catalogo_unique.groupby("genero_principal", as_index=False)
+    .agg(
+        popularidad_promedio=("popularidad", "mean"),
+        titulos=("id_muestra", "nunique"),
+    )
+)
+genero_ejecutivo_elegible = genero_ejecutivo[
+    genero_ejecutivo["titulos"] >= min(20, len(catalogo_unique))
+]
+if genero_ejecutivo_elegible.empty:
+    genero_ejecutivo_elegible = genero_ejecutivo
+genero_destacado = genero_ejecutivo_elegible.sort_values(
+    ["popularidad_promedio", "titulos"], ascending=False
+).iloc[0]
+
+roi_mediano_ejecutivo = pd.to_numeric(
+    catalogo_unique.loc[catalogo_unique["tipo"] == "Pelicula", "roi"],
+    errors="coerce",
+).median()
+
+st.subheader("Resumen ejecutivo")
+ejecutivo1, ejecutivo2, ejecutivo3 = st.columns(3)
+ejecutivo1.metric("Catálogo analizado", f"{catalogo_unique['id_muestra'].nunique():,} títulos")
+ejecutivo2.metric(
+    "Género con mayor popularidad promedio",
+    str(genero_destacado["genero_principal"]),
+    f"Popularidad {genero_destacado['popularidad_promedio']:.2f}",
+)
+ejecutivo3.metric(
+    "ROI mediano de películas",
+    f"{roi_mediano_ejecutivo:.2%}" if pd.notna(roi_mediano_ejecutivo) else "N/D",
+    "Series: sin datos financieros",
+)
+st.caption(
+    "Lectura rápida para adquisición y promoción. Las señales respetan los filtros seleccionados."
+)
+
 st.subheader("KPI principal")
 col1, col2, col3, col4, col5, col6 = st.columns(6)
 col1.metric("Total títulos", f"{catalogo_unique['id_muestra'].nunique():,}")
@@ -380,6 +434,51 @@ col5.metric("Rating promedio", f"{catalogo_unique['promedio_votos'].mean():.2f}"
 col6.metric("Votos totales", f"{int(catalogo_unique['votos'].sum()):,}")
 
 st.markdown("---")
+
+financieros = catalogo_unique[catalogo_unique["tipo"] == "Pelicula"].copy()
+financieros["presupuesto"] = pd.to_numeric(financieros["presupuesto"], errors="coerce")
+financieros["ingresos"] = pd.to_numeric(financieros["ingresos"], errors="coerce")
+financieros_validos = financieros[
+    (financieros["presupuesto"] > 0) & (financieros["ingresos"] > 0)
+]
+presupuesto_total = financieros_validos["presupuesto"].sum()
+ingresos_total = financieros_validos["ingresos"].sum()
+roi_global = (
+    (ingresos_total - presupuesto_total) / presupuesto_total
+    if presupuesto_total > 0
+    else None
+)
+
+st.subheader("KPI financieros")
+fin_col1, fin_col2, fin_col3, fin_col4 = st.columns(4)
+fin_col1.metric("Presupuesto total", f"{presupuesto_total:,.0f}")
+fin_col2.metric("Ingresos totales", f"{ingresos_total:,.0f}")
+fin_col3.metric(
+    "ROI global ponderado",
+    f"{roi_global:.2%}" if roi_global is not None else "N/D",
+)
+fin_col4.metric("Películas con datos válidos", f"{len(financieros_validos):,}")
+st.caption(
+    "Calculado únicamente con películas que tienen presupuesto e ingresos mayores que cero; "
+    "las series no contienen variables financieras."
+)
+with st.expander("Ver películas incluidas en los KPI financieros"):
+    detalle_financiero = financieros_validos[
+        ["titulo", "anio_estreno", "presupuesto", "ingresos", "roi"]
+    ].copy()
+    detalle_financiero = detalle_financiero.rename(
+        columns={
+            "titulo": "Película",
+            "anio_estreno": "Año",
+            "presupuesto": "Presupuesto",
+            "ingresos": "Ingresos",
+            "roi": "ROI",
+        }
+    ).sort_values("Película")
+    detalle_financiero["ROI"] = detalle_financiero["ROI"].map(
+        lambda value: f"{value:.2%}"
+    )
+    st.dataframe(detalle_financiero, hide_index=True, use_container_width=True, height=360)
 
 colA, colB = st.columns(2)
 
