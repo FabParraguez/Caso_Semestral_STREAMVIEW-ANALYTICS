@@ -22,7 +22,7 @@ streamlit run .\Entregables_EP1\dashboard_gerencia_contenidos.py
 > También puedes usar el Python del entorno virtual:
 >
 > ```bash
-> "/Users/tabathagamboa/Desktop/informatica_repositorios/visualizacion de datos/.venv/bin/python" -m streamlit run dashboard_streamlit.py
+> streamlit run .\Entregables_EP1\dashboard_gerencia_contenidos.py
 > ```
 
 ## 4) Abrir en navegador
