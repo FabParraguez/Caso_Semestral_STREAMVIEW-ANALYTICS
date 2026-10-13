@@ -1,34 +1,28 @@
-# Dashboard EP1 — StreamView Analytics
+# Dashboard de Gerencia de Contenidos — StreamView Analytics
 
-Guía rápida para levantar el dashboard interactivo.
+Dashboard interactivo orientado a la Evaluación Parcial 2 (diseño de dashboards) y a las decisiones de adquisición, gestión y promoción de contenidos.
 
-## 1) Ir a la carpeta
-Ubícate en:
+## Puesta en marcha
 
-`.../Caso_Semestral_STREAMVIEW-ANALYTICS/Entregables_EP1`
+Desde la raíz del proyecto:
 
-## 2) Instalar dependencias (si aún no están)
-
-```bash
-pip install -r requirements_dashboard.txt
-```
-
-## 3) Ejecutar el dashboard
-
-```bash
+```powershell
+pip install -r .\Entregables_EP1\requirements_dashboard.txt
 streamlit run .\Entregables_EP1\dashboard_gerencia_contenidos.py
 ```
 
-> También puedes usar el Python del entorno virtual:
->
-> ```bash
-> streamlit run .\Entregables_EP1\dashboard_gerencia_contenidos.py
-> ```
+Streamlit indicará la URL local para abrir el dashboard, normalmente `http://localhost:8501`.
 
-## 4) Abrir en navegador
-Streamlit mostrará una URL local, normalmente:
+## Alcance e interacción
 
-- http://localhost:8501
+- Síntesis ejecutiva y KPI de catálogo y finanzas de películas.
+- Filtros globales por tipo, año, país productor, género e idioma, con opción para restablecerlos.
+- Navegación lateral hacia composición, desempeño por género, países, finanzas y recomendaciones.
+- Tablas de detalle y visualizaciones interactivas para profundizar en segmentos del catálogo.
+- Justificación de diseño, metodología y limitaciones disponible al final del dashboard.
 
-## Nota
-No ejecutes con `python3 dashboard_streamlit.py`, porque Streamlit requiere el comando `streamlit run`.
+**Criterios de lectura:** popularidad es un índice del dataset, no reproducciones; el país corresponde a producción; ROI considera películas con presupuesto e ingresos positivos. Las series no tienen indicadores financieros comparables en la fuente.
+
+## Datos requeridos
+
+El dashboard carga `Dataset_Utilizado/peliculas_clean.csv` y `Dataset_Utilizado/series_clean.csv` desde la raíz del proyecto.

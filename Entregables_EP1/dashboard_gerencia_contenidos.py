@@ -1,3 +1,4 @@
+from html import escape
 from pathlib import Path
 
 import pandas as pd
@@ -15,35 +16,34 @@ st.set_page_config(
 st.markdown(
     """
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
-
     :root {
-        --sv-ink: #e8eef2;
-        --sv-muted: #9eabb4;
-        --sv-panel: #151c22;
-        --sv-panel-soft: #1b252d;
-        --sv-line: rgba(160, 181, 194, 0.18);
-        --sv-accent: #55c2b4;
-        --sv-accent-soft: rgba(85, 194, 180, 0.12);
+        --sv-ink: #183247;
+        --sv-muted: #586d7d;
+        --sv-panel: #ffffff;
+        --sv-page: #f4f7f9;
+        --sv-line: #dce5eb;
+        --sv-accent: #147d78;
+        --sv-accent-soft: #e8f4f2;
+        --sv-warm: #c76b43;
     }
 
     html, body, [class*="css"] {
-        font-family: 'DM Sans', sans-serif;
+        font-family: "Segoe UI", Arial, sans-serif;
     }
 
     .stApp {
-        background: #0c1115;
+        background: var(--sv-page);
         color: var(--sv-ink);
     }
 
     .main .block-container {
         max-width: 1480px;
-        padding: 2.2rem 3.2rem 3rem;
+        padding: 2rem 3rem 3rem;
     }
 
     h1, h2, h3 {
-        font-family: 'Space Grotesk', sans-serif;
-        letter-spacing: 0;
+        color: var(--sv-ink);
+        letter-spacing: -0.02em;
     }
 
     h1 {
@@ -54,7 +54,7 @@ st.markdown(
 
     h2 {
         font-size: 1.25rem !important;
-        font-weight: 600 !important;
+        font-weight: 650 !important;
         margin-top: 1.5rem !important;
     }
 
@@ -68,7 +68,7 @@ st.markdown(
     }
 
     [data-testid="stSidebar"] {
-        background: #11181e;
+        background: #edf3f5;
         border-right: 1px solid var(--sv-line);
     }
 
@@ -78,26 +78,37 @@ st.markdown(
         color: var(--sv-ink);
     }
 
+    [data-testid="stSidebar"] a {
+        color: var(--sv-ink);
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    [data-testid="stSidebar"] a:hover {
+        color: var(--sv-accent);
+    }
+
     [data-testid="stSidebar"] .stButton > button {
-        background: var(--sv-accent-soft);
-        border: 1px solid rgba(85, 194, 180, 0.45);
-        color: #baf1e9;
+        background: var(--sv-accent);
+        border: 1px solid var(--sv-accent);
+        color: #ffffff;
         font-weight: 600;
     }
 
     [data-testid="stSidebar"] .stButton > button:hover {
-        background: rgba(85, 194, 180, 0.2);
-        border-color: var(--sv-accent);
-        color: #e8fffa;
+        background: #106762;
+        border-color: #106762;
+        color: #ffffff;
     }
 
     [data-testid="stMetric"] {
         background: var(--sv-panel);
         border: 1px solid var(--sv-line);
         border-top: 3px solid var(--sv-accent);
-        border-radius: 8px;
+        border-radius: 12px;
         padding: 0.85rem 1rem 0.8rem;
         min-height: 110px;
+        box-shadow: 0 2px 8px rgba(24, 50, 71, 0.04);
     }
 
     [data-testid="stMetricLabel"] {
@@ -108,8 +119,8 @@ st.markdown(
 
     [data-testid="stMetricValue"] {
         color: var(--sv-ink);
-        font-family: 'Space Grotesk', sans-serif;
         font-size: 1.65rem;
+        font-weight: 700;
     }
 
     [data-testid="stVerticalBlockBorderWrapper"] {
@@ -118,7 +129,7 @@ st.markdown(
 
     .stCaption {
         color: var(--sv-muted);
-        font-size: 0.95rem;
+        font-size: 0.92rem;
     }
 
     hr {
@@ -128,30 +139,36 @@ st.markdown(
 
     [data-testid="stDataFrame"] {
         border: 1px solid var(--sv-line);
-        border-radius: 8px;
+        border-radius: 10px;
         overflow: hidden;
     }
 
     .recommendation-card {
         background: var(--sv-panel);
         border: 1px solid var(--sv-line);
-        border-left: 3px solid var(--sv-accent);
-        border-radius: 8px;
-        min-height: 145px;
+        border-left: 4px solid var(--sv-accent);
+        border-radius: 10px;
+        min-height: 155px;
         padding: 1rem 1.1rem;
         color: var(--sv-ink);
-        line-height: 1.5;
+        line-height: 1.55;
+        box-shadow: 0 2px 8px rgba(24, 50, 71, 0.04);
     }
 
     .recommendation-card b {
-        color: #baf1e9;
-        font-family: 'Space Grotesk', sans-serif;
+        color: var(--sv-accent);
         font-size: 0.98rem;
     }
     </style>
     """,
     unsafe_allow_html=True,
 )
+
+px.defaults.template = "plotly_white"
+px.defaults.color_discrete_map = {
+    "Pelicula": "#147d78",
+    "Serie": "#d17a4b",
+}
 
 
 BASE_DIR = Path(__file__).resolve().parents[1]
@@ -336,9 +353,27 @@ def apply_filters(df: pd.DataFrame) -> pd.DataFrame:
 
 
 st.title("Gerencia de Contenidos")
-st.caption("StreamView Analytics  /  Panel de decisión para adquisición, producción y promoción")
+st.caption("StreamView Analytics · Panel de decisión para adquisición, producción y promoción")
+st.info(
+    "Explora la composición y el desempeño del catálogo para detectar oportunidades. "
+    "Popularidad es un índice de la fuente, no una cantidad de visualizaciones."
+)
+
+st.sidebar.markdown("### Navegación")
+st.sidebar.markdown(
+    "[Resumen ejecutivo](#resumen-ejecutivo)  \n"
+    "[Indicadores del catálogo](#indicadores-del-catalogo)  \n"
+    "[Evolución y composición](#composicion-y-evolucion-del-catalogo)  \n"
+    "[Países productores](#comparacion-de-paises-productores)  \n"
+    "[Desempeño financiero](#kpi-financieros)  \n"
+    "[Oportunidades por género](#impacto-por-genero)  \n"
+    "[Duración](#duracion-y-atractivo-de-audiencia)  \n"
+    "[Decisiones sugeridas](#recomendaciones-de-negocio)  \n"
+    "[Títulos destacados](#top-titulos-por-impacto-equilibrado-mayor-a-menor)"
+)
 
 st.sidebar.header("Filtros de contenido")
+st.sidebar.caption("Los gráficos y recomendaciones se actualizan con estos filtros.")
 
 tipos_disponibles = sorted(catalogo["tipo"].dropna().unique().tolist())
 min_year = int(catalogo["anio_estreno"].min())
@@ -431,14 +466,18 @@ st.caption(
     "Lectura rápida para adquisición y promoción. Las señales respetan los filtros seleccionados."
 )
 
-st.subheader("KPI principal")
+st.subheader("Indicadores del catálogo")
 col1, col2, col3, col4, col5, col6 = st.columns(6)
 col1.metric("Total títulos", f"{catalogo_unique['id_muestra'].nunique():,}")
 col2.metric("Películas", f"{catalogo_unique[catalogo_unique['tipo']=='Pelicula']['id_muestra'].nunique():,}")
 col3.metric("Series", f"{catalogo_unique[catalogo_unique['tipo']=='Serie']['id_muestra'].nunique():,}")
-col4.metric("Popularidad promedio", f"{catalogo_unique['popularidad'].mean():.2f}")
-col5.metric("Rating promedio", f"{catalogo_unique['promedio_votos'].mean():.2f}")
+col4.metric("Popularidad promedio (índice)", f"{catalogo_unique['popularidad'].mean():.2f}")
+col5.metric("Valoración promedio", f"{catalogo_unique['promedio_votos'].mean():.2f}")
 col6.metric("Votos totales", f"{int(catalogo_unique['votos'].sum()):,}")
+st.caption(
+    "La popularidad es un índice del dataset y los votos corresponden a valoraciones registradas; "
+    "ninguno representa reproducciones de StreamView."
+)
 
 st.markdown("---")
 
@@ -487,6 +526,7 @@ with st.expander("Ver películas incluidas en los KPI financieros"):
     )
     st.dataframe(detalle_financiero, hide_index=True, use_container_width=True, height=360)
 
+st.subheader("Composición y evolución del catálogo")
 colA, colB = st.columns(2)
 
 with colA:
@@ -540,6 +580,7 @@ country_summary = (
     )
     .query("titulos >= 20")
 )
+st.subheader("Comparación de países productores")
 top_countries_volume = country_summary.nlargest(10, "titulos")
 top_countries_popularity = country_summary.nlargest(10, "popularidad_promedio")
 country_names = set(top_countries_volume["pais_principal"]) | set(
@@ -568,7 +609,7 @@ fig_country_comparison.add_scatter(
     text=country_comparison["popularidad_promedio"],
     texttemplate="%{text:.2f}",
     textposition="top center",
-    line={"color": "#55c2b4", "width": 3},
+    line={"color": "#147d78", "width": 3},
     marker={"size": 8},
     yaxis="y2",
     hovertemplate="%{x}<br>Popularidad: %{y:.2f}<extra></extra>",
@@ -580,6 +621,7 @@ fig_country_comparison.update_layout(
     yaxis2={"title": "Popularidad promedio", "overlaying": "y", "side": "right"},
     hovermode="x unified",
     legend={"orientation": "h", "y": 1.12},
+    template="plotly_white",
 )
 st.plotly_chart(fig_country_comparison, config={"displayModeBar": False}, use_container_width=True)
 
@@ -813,6 +855,9 @@ titulos_recomendados = [
     for titulo in titulos_recomendados
 ]
 titulos_texto = ", ".join(titulos_recomendados)
+genero_recomendado_html = escape(str(genero_recomendado["genero_principal"]))
+pais_recomendado_html = escape(str(pais_recomendado["pais_principal"]))
+titulos_texto_html = escape(titulos_texto)
 
 st.subheader("Recomendaciones de negocio")
 rec1, rec2, rec3 = st.columns(3)
@@ -822,7 +867,7 @@ with rec1:
         f"""
         <div class='recommendation-card'>
         <b>1. Priorizar adquisiciones</b><br>
-        Evaluar nuevas adquisiciones en <b>{genero_recomendado['genero_principal']}</b>, que equilibra popularidad ({genero_recomendado['popularidad_promedio']:.2f}) y rating ({genero_recomendado['rating_promedio']:.2f}) entre los géneros con evidencia suficiente ({int(genero_recomendado['titulos']):,} títulos).
+        Evaluar nuevas adquisiciones en <b>{genero_recomendado_html}</b>, que equilibra popularidad ({genero_recomendado['popularidad_promedio']:.2f}) y valoración ({genero_recomendado['rating_promedio']:.2f}) entre los géneros con evidencia suficiente ({int(genero_recomendado['titulos']):,} títulos).
         </div>
         """,
         unsafe_allow_html=True,
@@ -832,8 +877,8 @@ with rec2:
     st.markdown(
         f"""
         <div class='recommendation-card'>
-        <b>2. Producir con foco</b><br>
-        Considerar producciones de <b>{pais_recomendado['pais_principal']}</b> por su equilibrio entre popularidad ({pais_recomendado['popularidad_promedio']:.2f}) y rating ({pais_recomendado['rating_promedio']:.2f}), con evidencia suficiente ({int(pais_recomendado['titulos']):,} títulos).
+        <b>2. Explorar alianzas y adquisiciones</b><br>
+        Evaluar el portafolio de <b>{pais_recomendado_html}</b> como oportunidad de exploración por su equilibrio entre popularidad ({pais_recomendado['popularidad_promedio']:.2f}) y valoración ({pais_recomendado['rating_promedio']:.2f}), con evidencia suficiente ({int(pais_recomendado['titulos']):,} títulos).
         </div>
         """,
         unsafe_allow_html=True,
@@ -844,7 +889,7 @@ with rec3:
         f"""
         <div class='recommendation-card'>
         <b>3. Promocionar con criterio</b><br>
-        Priorizar campañas para <b>{titulos_texto}</b>, los títulos con mayor popularidad dentro del género <b>{genero_recomendado['genero_principal']}</b>.
+        Revisar <b>{titulos_texto_html}</b> como candidatos para campañas: combinan popularidad y valoración destacadas dentro del género <b>{genero_recomendado_html}</b>.
         </div>
         """,
         unsafe_allow_html=True,
@@ -860,3 +905,15 @@ impact_table = titulos_impacto.sort_values("indice_equilibrado", ascending=False
 impact_table.insert(0, "Posición", range(1, len(impact_table) + 1))
 
 st.dataframe(impact_table, width="stretch", hide_index=True)
+
+with st.expander("Justificación del diseño y criterios de lectura"):
+    st.markdown(
+        """
+        - **Público y propósito:** gerencia de contenidos; priorizar adquisición, evaluación del portafolio y promoción.
+        - **Jerarquía visual:** primero una síntesis ejecutiva y sus KPI; después comparaciones por año, género y país; al final, recomendaciones y títulos para profundizar.
+        - **Interacción:** filtros globales por tipo, año, país productor, género e idioma; los gráficos, KPI y recomendaciones se recalculan con la selección. La navegación lateral permite saltar entre secciones y el botón de filtros restaura la vista completa.
+        - **Color y legibilidad:** fondo claro para reducir carga visual, azul oscuro para texto y verde azulado como acento de acción; un tono cálido diferencia películas de series en gráficos comparativos. Las tarjetas y espacios separan grupos sin competir con los datos.
+        - **Criterio analítico:** el índice equilibrado pondera 50 % popularidad relativa y 50 % valoración relativa. Las recomendaciones son señales exploratorias, no pronósticos; se exige una base mínima de 20 títulos cuando existe suficiente volumen.
+        - **Límites de los datos:** popularidad no equivale a reproducciones; país corresponde al productor, no a la audiencia; ROI se calcula solo para películas con presupuesto e ingresos positivos. La duración no se interpreta si la fuente no la informa de forma útil.
+        """
+    )
