@@ -66,7 +66,7 @@ Resultado: Dashboard entendible, atractivo y enfocado en decisiones.
 
 5. Construir el dashboard
 
-Desarrollo del dashboard en Power BI / Tableau / Excel (según herramienta definida).
+Desarrollo del dashboard en Streamlit / Tableau / Excel (según herramienta definida).
 
 Elementos del dashboard:
 
