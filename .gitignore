@@ -1,0 +1,21 @@
+# Entorno virtual y archivos generados por Python
+.venv/
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Cuadernos y herramientas
+.ipynb_checkpoints/
+.vscode/
+
+# Configuracion local y secretos
+.env
+.env.*
+!.env.example
+*.secret
+
+# Archivos temporales y de sistema
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
